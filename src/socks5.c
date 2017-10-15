@@ -10,8 +10,8 @@
 #include "socks5.h"
 #include "pipe.h"
 
-#define SOCKS5_ATYP_IPV4	0x01
 #define SOCKS5_ATYP_FQDN	0x03
+#define SOCKS5_ATYP_IPV6	0x04
 
 #define SOCKS5_CMD_CONNECT	0x01
 #define SOCKS5_CMD_BIND		0x02
@@ -58,10 +58,10 @@ socks5_response(struct socks_data *sdata, int code, int connected, int die)
 	struct socks5_req req = {
 		.version = 5,
 		.cmd = code,
-		.atyp = SOCKS5_ATYP_IPV4
+		.atyp = SOCKS5_ATYP_IPV6
 	};
 	u_int16_t port;
-	u_int16_t addr;
+	u32_t *addr;
 
 	data = container_of(sdata, struct socks5_data, socks);
 
@@ -69,14 +69,14 @@ socks5_response(struct socks_data *sdata, int code, int connected, int die)
 	bufferevent_write(sdata->bev, &req, sizeof(req));
 	if (!die) {
 		if (connected && data->cmd == SOCKS5_CMD_BIND) {
-			addr = sdata->pcb->remote_ip.addr;
+			addr = sdata->pcb->remote_ip.u_addr.ip6.addr;
 			port = htons(sdata->pcb->remote_port);
 		} else {
-			addr = sdata->pcb->local_ip.addr;
+			addr = sdata->pcb->local_ip.u_addr.ip6.addr;
 			port = htons(sdata->pcb->local_port);
 		}
 	} else {
-		addr = sdata->ipaddr.addr;
+		addr = sdata->ipaddr.u_addr.ip6.addr;
 		port = sdata->port;
 	}
 	bufferevent_write(sdata->bev, &addr, 4);
@@ -134,9 +134,9 @@ socks5_read_port(struct socks_data *sdata)
 }
 
 static void
-socks5_read_ipv4(struct socks_data *sdata)
+socks5_read_ipv6(struct socks_data *sdata)
 {
-	bufferevent_read(sdata->bev, &sdata->ipaddr.addr, 4);
+	bufferevent_read(sdata->bev, &sdata->ipaddr.u_addr.ip6.addr, 4);
 	socks_request(sdata, 2, socks5_read_port);
 }
 
@@ -202,8 +202,8 @@ socks5_read_hdr(struct socks_data *sdata)
 
         LWIP_DEBUGF(SOCKS_DEBUG, ("%s: cmd %d, atyp %d\n", __func__, req.cmd, req.atyp));
 
-	if (req.atyp == SOCKS5_ATYP_IPV4)
-		socks_request(sdata, 4, socks5_read_ipv4);
+	if (req.atyp == SOCKS5_ATYP_IPV6)
+		socks_request(sdata, 4, socks5_read_ipv6);
 	else if (req.atyp == SOCKS5_ATYP_FQDN)
 		socks_request(sdata, 1, socks5_read_n_fqdn);
 	else

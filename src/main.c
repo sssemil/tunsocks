@@ -108,10 +108,10 @@ static void print_usage(const char *argv0)
 "    -R bind_port:host_address:host_port\n"
 "    -g Allow non-local clients (command line compatibility for ocproxy)\n"
 "    -k keep alive interval (seconds)\n"
-"    -m mtu (env INTERNAL_IP4_MTU)\n"
+"    -m mtu (env INTERNAL_IP6_MTU)\n"
 "    -s domain_search[,domain_search,...] (env CISCO_DEF_DOMAIN)\n"
-"    -d dns,[dns,...] (env INTERNAL_IP4_DNS)\n"
-"    -i ip address (env INTERNAL_IP4_ADDRESS)\n"
+"    -d dns,[dns,...] (env INTERNAL_IP6_DNS)\n"
+"    -i ip address (env INTERNAL_IP6_ADDRESS)\n"
 "    -n netmask\n"
 "    -G gateway\n"
 #ifdef USE_PCAP
@@ -133,10 +133,10 @@ int main(int argc, char *argv[])
 	int mtu;
 	int fd_in;
 	int fd_out;
-	ip4_addr_t ipaddr;
-	ip4_addr_t netmask;
-	ip4_addr_t gateway;
-	ip4_addr_t dns;
+	ip_addr_t ipaddr;
+	ip_addr_t netmask;
+	ip_addr_t gateway;
+	ip_addr_t dns;
 	struct event_base *base;
 	char *pcap_file;
 	struct conn_info *local;
@@ -163,14 +163,17 @@ int main(int argc, char *argv[])
 	lwip_init();
 	libevent_timeouts_init(base);
 
-	if ((str = getenv("INTERNAL_IP4_ADDRESS")))
-		ip4addr_aton(str, &ipaddr);
+	if ((str = getenv("INTERNAL_IP6_ADDRESS")))
+		ipaddr_aton(str, &ipaddr);
 
-	if ((str = getenv("INTERNAL_IP4_MTU")))
+	if ((str = getenv("INTERNAL_IP6_MTU")))
 		mtu = strtoul(str, NULL, 0);
 
-	if ((str = getenv("VPNFD")))
-		fd_in = fd_out = strtoul(str, NULL, 0);
+	if ((str = getenv("VPNFDIN")))
+		fd_in = strtoul(str, NULL, 0);
+
+	if ((str = getenv("VPNFDOUT")))
+		fd_out = strtoul(str, NULL, 0);
 
 	if ((str = getenv("CISCO_DEF_DOMAIN"))) {
 		endptr = str;
@@ -178,10 +181,10 @@ int main(int argc, char *argv[])
 			host_add_search(str);
 	}
 
-	if ((str = getenv("INTERNAL_IP4_DNS")))	{
+	if ((str = getenv("INTERNAL_IP6_DNS")))	{
 		endptr = str;
 		while ((str = tokenize(endptr, ", ", &endptr))) {
-			ip4addr_aton(str, &dns);
+			ipaddr_aton(str, &dns);
 			dns_setserver(dns_count++, &dns);
 			free(str);
 		}
@@ -231,19 +234,19 @@ int main(int argc, char *argv[])
 			break;
 		case 'd':
 			while ((str = tokenize(optarg, ", ", &optarg))) {
-				ip4addr_aton(str, &dns);
+				ipaddr_aton(str, &dns);
 				dns_setserver(dns_count++, &dns);
 				free(str);
 			}
 			break;
 		case 'i':
-			ip4addr_aton(optarg, &ipaddr);
+			ipaddr_aton(optarg, &ipaddr);
 			break;
 		case 'n':
-			ip4addr_aton(optarg, &netmask);
+			ipaddr_aton(optarg, &netmask);
 			break;
 		case 'G':
-			ip4addr_aton(optarg, &gateway);
+			ipaddr_aton(optarg, &gateway);
 			break;
 #ifdef USE_PCAP
 		case 'p':

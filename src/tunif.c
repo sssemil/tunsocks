@@ -8,6 +8,7 @@
 #include <lwip/pbuf.h>
 #include <lwip/stats.h>
 #include <lwip/ip4.h>
+#include <lwip/ip6.h>
 #include <lwip/init.h>
 #include <lwip/tcp_impl.h>
 #include <lwip/dns.h>

@@ -79,11 +79,11 @@ static void host_found(const char *name, const ip_addr_t *ipaddr, void *ctx)
 		return;
 	}
 
-	if (ipaddr && ipaddr->addr) {
+	if (ipaddr && ipaddr->u_addr.ip6.addr) {
 		LWIP_DEBUGF(HOSTS_DEBUG, ("%s: Success\n", __func__));
 		data->priv = NULL;
 		free(priv);
-		data->ipaddr.addr = ipaddr->addr;
+		data->ipaddr.u_addr = ipaddr->u_addr;
 		data->found(data);
 		return;
 	}

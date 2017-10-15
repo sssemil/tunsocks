@@ -9,7 +9,6 @@
 #include <sys/types.h>
 
 #include "socks.h"
-#include "socks4.h"
 #include "socks5.h"
 #include "host.h"
 #include "container_of.h"
@@ -194,9 +193,6 @@ socks_version(struct bufferevent *bev, void *ctx)
 	LWIP_DEBUGF(SOCKS_DEBUG, ("%s: socks version %d\n", __func__, version));
 
 	switch (version) {
-	case 4:
-		socks4_start(bev, keep_alive);
-		break;
 	case 5:
 		socks5_start(bev, keep_alive);
 		break;
