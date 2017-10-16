@@ -57,7 +57,7 @@ socks5_response(struct socks_data *sdata, int code, int connected, int die)
 	struct socks5_data *data;
 	struct socks5_req req = {
 		.version = 5,
-		.cmd = code,
+		.cmd = (u_char) code,
 		.atyp = SOCKS5_ATYP_IPV6
 	};
 	u_int16_t port;
@@ -164,7 +164,7 @@ socks5_host_failed(struct host_data *hdata)
 static void
 socks5_read_fqdn(struct socks_data *sdata)
 {
-	bufferevent_read(sdata->bev, sdata->host.fqdn, sdata->req_len);
+	bufferevent_read(sdata->bev, sdata->host.fqdn, (size_t) sdata->req_len);
 	sdata->host.fqdn[sdata->req_len] = '\0';
         LWIP_DEBUGF(SOCKS_DEBUG, ("%s: fqdn %s\n", __func__, sdata->host.fqdn));
 	bufferevent_disable(sdata->bev, EV_READ);
@@ -217,7 +217,7 @@ socks5_read_auth(struct socks_data *sdata)
 	struct socks5_rep rep = {5, 0};
 
 	if (sdata->req_len)
-		bufferevent_read(sdata->bev, auth, sdata->req_len);
+		bufferevent_read(sdata->bev, auth, (size_t) sdata->req_len);
 
 	bufferevent_write(sdata->bev, &rep, sizeof(rep));
 
