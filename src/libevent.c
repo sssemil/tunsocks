@@ -41,14 +41,10 @@
 
 #include "lwip/opt.h"
 
-#include "lwip/timers.h"
-#include "lwip/tcp_impl.h"
-
 #include "lwip/def.h"
 #include "lwip/memp.h"
 #include "lwip/tcpip.h"
 
-#include "lwip/ip_frag.h"
 #include "netif/etharp.h"
 #include "lwip/dhcp.h"
 #include "lwip/autoip.h"
@@ -62,6 +58,7 @@
 
 #include <time.h>
 #include <event2/event.h>
+#include <lwip/priv/tcp_priv.h>
 
 #if LWIP_TCP
 /** global variable that shows if the tcp timer is currently scheduled or not */

@@ -10,15 +10,15 @@
 #include <lwip/ip4.h>
 #include <lwip/ip6.h>
 #include <lwip/init.h>
-#include <lwip/tcp_impl.h>
 #include <lwip/dns.h>
-#include <lwip/snmp_mib2.h>
 
 #ifdef USE_PCAP
 #include <pcap/pcap.h>
 #endif
 
 #include <event2/event.h>
+#include <lwip/ip.h>
+#include <lwip/snmp.h>
 
 #include "tunif.h"
 
