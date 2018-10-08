@@ -2,6 +2,7 @@
 #define __HOST_H__
 
 #include <sys/types.h>
+#include <lwip/ip.h>
 
 struct host_data_priv;
 

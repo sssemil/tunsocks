@@ -94,7 +94,7 @@ tunif_init(struct netif *netif)
 	netif->name[0] = 't';
 	netif->name[1] = 'p';
 
-	netif->output = tunif_output;
+	netif->output_ip6 = tunif_output;
 	netif->mtu = 1360;
 	netif->flags = NETIF_FLAG_LINK_UP;
 
@@ -122,7 +122,7 @@ tunif_add(struct event_base *base, int fd_in, int fd_out, const char *pcap_file)
 	data->fd = fd_out;
 	data->ev = event_new(base, fd_in, EV_READ | EV_PERSIST, tunif_ready, data);
 	event_add(data->ev, NULL);
-	netif_add(&data->netif, NULL, NULL, NULL, data, tunif_init, ip_input);
+	netif_add(&data->netif, data, tunif_init, ip_input);
 	netif_set_default(&data->netif);
 	return &data->netif;
 }

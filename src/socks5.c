@@ -69,17 +69,17 @@ socks5_response(struct socks_data *sdata, int code, int connected, int die)
 	bufferevent_write(sdata->bev, &req, sizeof(req));
 	if (!die) {
 		if (connected && data->cmd == SOCKS5_CMD_BIND) {
-			addr = sdata->pcb->remote_ip.u_addr.ip6.addr;
+			addr = sdata->pcb->remote_ip.addr;
 			port = htons(sdata->pcb->remote_port);
 		} else {
-			addr = sdata->pcb->local_ip.u_addr.ip6.addr;
+			addr = sdata->pcb->local_ip.addr;
 			port = htons(sdata->pcb->local_port);
 		}
 	} else {
-		addr = sdata->ipaddr.u_addr.ip6.addr;
+		addr = sdata->ipaddr.addr;
 		port = sdata->port;
 	}
-	bufferevent_write(sdata->bev, &addr, 4);
+	bufferevent_write(sdata->bev, &addr, 16);
 	bufferevent_write(sdata->bev, &port, 2);
 	if (die)
 		socks_flush(sdata);
@@ -136,7 +136,7 @@ socks5_read_port(struct socks_data *sdata)
 static void
 socks5_read_ipv6(struct socks_data *sdata)
 {
-	bufferevent_read(sdata->bev, &sdata->ipaddr.u_addr.ip6.addr, 4);
+	bufferevent_read(sdata->bev, &sdata->ipaddr.addr, 4);
 	socks_request(sdata, 2, socks5_read_port);
 }
 
